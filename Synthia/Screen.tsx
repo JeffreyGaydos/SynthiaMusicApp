@@ -45,9 +45,9 @@ export default function Screen(screenProps: ScreenProps) {
     }
 
     function CheckSwipe(deltaX: number) {
-        if(deltaX > swipeThreshold) {
+        if(deltaX < -1 * swipeThreshold) {
             setSwipeRightState(true);
-        } else if(deltaX < -1 * swipeThreshold) {
+        } else if(deltaX > swipeThreshold) {
             setSwipeRightState(false);
         } else {
             setSwipeRightState(undefined);

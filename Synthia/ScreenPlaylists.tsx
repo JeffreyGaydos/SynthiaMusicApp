@@ -3,6 +3,7 @@ import {
   Text,
 } from 'react-native';
 import Screen from './Screen';
+import Playlists from './Playlists';
 
 function PlaylistsScreen({ navigation }: {navigation: any}) {
     function SwipeRight() {
@@ -15,7 +16,7 @@ function PlaylistsScreen({ navigation }: {navigation: any}) {
 
     return (
         <Screen rightCallback={SwipeRight} leftCallback={SwipeLeft}>
-            <Text>Hello Playlist Screen!</Text>
+            <Playlists navigation={navigation}></Playlists>
         </Screen>
     );
 }

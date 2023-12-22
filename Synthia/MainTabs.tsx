@@ -11,6 +11,7 @@ import ScreenAlbums from './ScreenAlbums';
 import ScreenMoods from './ScreenMoods';
 import ScreenTracks from './ScreenTracks';
 import { s_navigation, _navigation } from './styles';
+import Screen from './Screen';
 
 function MainTabs(): React.JSX.Element {
 

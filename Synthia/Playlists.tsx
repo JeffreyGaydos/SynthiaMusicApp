@@ -2,14 +2,11 @@ import React from 'react';
 import {
   Text, View,
 } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import 'react-native-gesture-handler';
 import PlaylistItem from './PlaylistItem';
 import { s_playlist_item } from './styles';
 
 function Playlists({ navigation }: {navigation: any}) {
-
-    const Stack = createNativeStackNavigator();
 
     return (
         <View style={s_playlist_item.grid}>
@@ -21,6 +18,7 @@ function Playlists({ navigation }: {navigation: any}) {
               duration: 1981,
               tracks: 35
             }}
+            navigation={navigation}
           />
           <PlaylistItem
             imageSrc={["https://raw.githubusercontent.com/JeffreyGaydos/SynthiaFrontend/playlist-item/Synthia/_data/Mountain4.jpg", "https://raw.githubusercontent.com/JeffreyGaydos/SynthiaFrontend/playlist-item/Synthia/_data/Mountain5.jpg", "https://raw.githubusercontent.com/JeffreyGaydos/SynthiaFrontend/playlist-item/Synthia/_data/Mountain6.jpg", "https://raw.githubusercontent.com/JeffreyGaydos/SynthiaFrontend/playlist-item/Synthia/_data/Mountain7.jpg"]}
@@ -30,6 +28,7 @@ function Playlists({ navigation }: {navigation: any}) {
               duration: 1924680,
               tracks: 18267
             }}
+            navigation={navigation}
           />
         </View>
     );

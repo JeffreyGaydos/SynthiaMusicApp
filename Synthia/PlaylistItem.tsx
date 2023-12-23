@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { s_playlist_item } from './styles';
 import Icon from 'react-native-vector-icons/Foundation';
+import routes from './routes';
 
 interface playlist_stats {
     albums: number,
@@ -12,7 +13,7 @@ interface playlist_stats {
     duration: number
 }
 
-function PlaylistItem({ imageSrc, title, stats }: { imageSrc: string[], title: string, stats: playlist_stats}) {
+function PlaylistItem({ imageSrc, title, stats, navigation }: { imageSrc: string[], title: string, stats: playlist_stats, navigation: any}) {
 
     const image1 = imageSrc[Math.floor(Math.random() * imageSrc.length)];
     imageSrc = imageSrc.filter(i => i != image1);
@@ -28,7 +29,10 @@ function PlaylistItem({ imageSrc, title, stats }: { imageSrc: string[], title: s
     const seconds = Math.floor((stats.duration - (days * 60 * 60 * 24) - (hours * 60 * 60)) - (minutes * 60));
 
     return (
-        <View style={s_playlist_item.item}>
+        <View
+            style={s_playlist_item.item}
+            onTouchStart={() => navigation.navigate(routes.PlaylistStack.Details)}
+        >
             <View style={s_playlist_item.icon_wrapper}>
                 <Image style={s_playlist_item.icon} src={image1}></Image>
                 <Image style={s_playlist_item.icon} src={image2}></Image>

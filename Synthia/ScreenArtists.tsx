@@ -5,16 +5,9 @@ import {
 import Screen from './Screen';
 
 function ArtistsScreen({ navigation }: {navigation: any}) {
-    function SwipeRight() {
-        navigation.navigate("Albums");
-    }
-
-    function SwipeLeft() {
-        navigation.navigate("Playlists");
-    }    
 
     return (
-        <Screen rightCallback={SwipeRight} leftCallback={SwipeLeft}>
+        <Screen>
             <Text>Hello Artists Screen!</Text>
         </Screen>
     );

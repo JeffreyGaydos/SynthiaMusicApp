@@ -5,16 +5,9 @@ import {
 import Screen from './Screen';
 
 function TracksScreen({ navigation }: {navigation: any}) {
-  function SwipeRight() {
-      console.log("Swipe Right ignored...");
-  }
-
-  function SwipeLeft() {
-      navigation.navigate("Moods");
-  }    
-
+  
   return (
-      <Screen rightCallback={SwipeRight} leftCallback={SwipeLeft}>
+      <Screen>
           <Text>Hello Artists Screen!</Text>
       </Screen>
   );

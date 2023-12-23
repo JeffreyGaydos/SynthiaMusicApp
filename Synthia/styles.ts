@@ -11,23 +11,20 @@ const _navigation = {
 const s_navigation = StyleSheet.create({
     tab_active: {
         backgroundColor: _navigation._colorActive,
-        width: 70,
         height: 4,
-        position: "absolute",
-        bottom: 6,
+        color: _navigation._colorAccent
     },
     tab_inactive: {
         //deliberately blank
     },
     tab_screen: {
         backgroundColor: _navigation._colorBackground,
-        borderBottomColor: _navigation._colorDeepAccent,
+        borderBottomColor: _navigation._colorAccent,
         borderBottomWidth: 2
     },
     tab_label: {
-        position: "absolute",
-        top: 13,
-        fontSize: 19,
+        fontSize: 13,
+        margin: 0
     },
     tab_bar: {
         backgroundColor: "black",

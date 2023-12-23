@@ -4,6 +4,7 @@ import { DimensionValue, StyleSheet } from "react-native";
 const _colors = {
     _colorActive: "#AFAFAF",
     _colorAccent: "#5F5FFF",
+    // _colorAccent: "darkred",
     _colorDeepAccent: "blue",
     _colorBackground: "#0F0F0F"
 } 

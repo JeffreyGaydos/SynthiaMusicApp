@@ -7,7 +7,7 @@ import ScreenArtists from './ScreenArtists';
 import ScreenAlbums from './ScreenAlbums';
 import ScreenMoods from './ScreenMoods';
 import ScreenTracks from './ScreenTracks';
-import { s_navigation, _navigation } from './styles';
+import { s_navigation, _colors } from './styles';
 
 function MainTabs(): React.JSX.Element {
 
@@ -19,8 +19,8 @@ function MainTabs(): React.JSX.Element {
         screenOptions={{
           tabBarStyle: s_navigation.tab_bar,
           tabBarLabelStyle: s_navigation.tab_label,
-          tabBarActiveTintColor: _navigation._colorActive,
-          tabBarInactiveTintColor: _navigation._colorAccent,
+          tabBarActiveTintColor: _colors._colorActive,
+          tabBarInactiveTintColor: _colors._colorAccent,
           tabBarIndicatorStyle: s_navigation.tab_active,
           tabBarGap: 1,
           tabBarAndroidRipple: { borderless: false }

@@ -3,9 +3,9 @@ import {
     Image,
   Text, View,
 } from 'react-native';
-import { s_playlist_item } from './styles';
+import { s_playlist_item } from '../styles';
 import Icon from 'react-native-vector-icons/Foundation';
-import routes from './routes';
+import routes from '../routes';
 
 interface playlist_stats {
     albums: number,

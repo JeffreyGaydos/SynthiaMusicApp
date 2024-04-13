@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import PlaylistItem from './PlaylistItem';
-import { s_playlist_item } from './styles';
+import { s_playlist_item } from '../styles';
 
 function Playlists({ navigation }: {navigation: any}) {
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import Screen from './Screen';
+import Screen from '../Screen';
 import Playlists from './Playlists';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { s_navigation } from './styles';
-import routes from './routes';
+import { s_navigation } from '../styles';
+import routes from '../routes';
 import PlaylistDetails from './PlaylistDetails';
 
 function PlaylistsScreen({ navigation }: {navigation: any}) {

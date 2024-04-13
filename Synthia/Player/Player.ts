@@ -29,7 +29,23 @@ const s_player = StyleSheet.create({
     },
 
     spacer: {
+        flexDirection: 'row',
         flex: 1
+    },
+
+    cover: {
+        height: '100%' as DimensionValue,
+        width: '100%' as DimensionValue,
+        position: "absolute"
+    },
+
+    coverWindow: {
+        opacity: 0.25,
+        backgroundColor: "black",
+        height: '100%' as DimensionValue,
+        width: '100%' as DimensionValue,
+        position: "absolute",
+        zIndex: -1
     },
 
     controlWidget: {

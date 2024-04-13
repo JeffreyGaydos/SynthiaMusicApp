@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
     Button,
     Image,
@@ -9,22 +9,18 @@ import Icon from 'react-native-vector-icons/Foundation';
 import routes from '../routes';
 import { s_track_item } from './TrackItemStyles';
 import TrackPlayer from 'react-native-track-player';
+import { PlayerTrack } from '../MainTabs';
 
 function TrackItem({ image, title, musicPath, navigation }: { image: string, title: string, musicPath: string, navigation: any}) {
+    const { setPlayerTrack } = useContext(PlayerTrack);
     function PlayTrack() {
-        (async () => {
-            await TrackPlayer.reset();
-
-            await TrackPlayer.add({
-                id: musicPath,
-                url: musicPath,
-                title: title,
-                artist: "GUNSHIP",
-                artwork: image
-            });
-
-            await TrackPlayer.play();
-        })();
+        setPlayerTrack({
+            id: musicPath,
+            url: musicPath,
+            title: title,
+            artist: "GUNSHIP",
+            artwork: image
+        });
     }
 
     return (

@@ -27,7 +27,7 @@ function Player({addTrack} : {addTrack: AddTrack | undefined}) {
 
     useEffect(() => {
         fadeAnim.setValue(0);
-        if(addTrack?.artwork) {
+        if(addTrack?.artwork !== "Not found") {
             beginCoverFade();
         }
     }, [addTrack?.artwork]);

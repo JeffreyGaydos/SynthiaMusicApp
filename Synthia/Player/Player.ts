@@ -24,7 +24,7 @@ const s_player = StyleSheet.create({
 
     controls: {
         flexDirection: 'row',
-        flex: 1,
+        flex: 2,
         justifyContent: 'center'
     },
 
@@ -51,11 +51,18 @@ const s_player = StyleSheet.create({
     controlWidget: {
         height: '100%' as DimensionValue,
         width: '100%' as DimensionValue,
-        fontSize: 30,
-        paddingVertical: 10,
+        paddingVertical: 9,
         flex: 1,
         color: _colors._colorAccent,
-        textAlign: 'center'
+        textAlign: 'center',
+    },
+
+    fadableControlWidget: {
+        height: '100%' as DimensionValue,
+        width: '100%' as DimensionValue,
+        flex: 1,
+        color: _colors._colorAccent,
+        textAlign: 'center',
     },
 
     playpause: {
@@ -65,6 +72,19 @@ const s_player = StyleSheet.create({
     },
 
     previous: {
+    },
+
+    shuffle: {
+    },
+
+    repeat: {
+    },
+
+    inactiveControlWidget: {
+        opacity: 0.5
+        // color: _colors._colorBackground,
+        // textShadowColor: "white",
+        // textShadowRadius: 10
     }
 });
 

@@ -6,17 +6,36 @@ import Icon from 'react-native-vector-icons/Foundation';
 
 const progressRefreshRateMsec = 250;
 
-function Player({addTrack} : {addTrack: AddTrack | undefined}) {
+type PlayerTrackState = {
+    shuffle: boolean,
+    toggleShuffle: () => void,
+    repeat: boolean,
+    toggleRepeat: () => void
+};
+
+function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackState: PlayerTrackState}) {
     const [playState, setPlayState] = useState<boolean>(false);
     const [trackProgress, setTrackProgress] = useState<number>(0);
     const [needProgressUpdate, setNeedProgressUpdate] = useState<boolean>(true);
+    const [shuffle, setShuffle] = useState<boolean>(trackState?.shuffle ?? false);
+    const [repeat, setRepeat] = useState<boolean>(trackState?.repeat ?? false);
 
     const fadeAnim = useRef(new Animated.Value(0)).current;
+    const shuffleFadeAnim = trackState?.shuffle ? useRef(new Animated.Value(1)).current : useRef(new Animated.Value(0.5)).current;
+    const repeatFadeAnim = trackState?.repeat ? useRef(new Animated.Value(1)).current : useRef(new Animated.Value(0.5)).current;
 
     function beginCoverFade() {
         Animated.timing(fadeAnim, {
             toValue: 1,
             duration: 750,
+            useNativeDriver: true
+        }).start();
+    }
+
+    function beginShuffleFade(anim: Animated.Value, to: number) {
+        Animated.timing(anim, {
+            toValue: to,
+            duration: 150,
             useNativeDriver: true
         }).start();
     }
@@ -99,6 +118,18 @@ function Player({addTrack} : {addTrack: AddTrack | undefined}) {
                 <View style={s_player.container}>
                     <View style={s_player.spacer}></View>
                     <View style={s_player.controls}>
+                        <Animated.View style={{...s_player.controlWidget, opacity: shuffleFadeAnim}}>
+                            <Icon 
+                                style={{...s_player.shuffle, ...s_player.fadableControlWidget}}
+                                name="shuffle"
+                                size={30}
+                                onPress={() => {
+                                    console.log("TODO: Shuffle UNIMPLEMENTED");
+                                    beginShuffleFade(shuffleFadeAnim, !shuffle ? 1 : 0.5);
+                                    setShuffle(!shuffle);
+                                }}
+                            />
+                        </Animated.View>
                         <Icon 
                             style={{...s_player.previous, ...s_player.controlWidget}}
                             name="previous"
@@ -119,6 +150,18 @@ function Player({addTrack} : {addTrack: AddTrack | undefined}) {
                             size={30}
                             onPress={() => console.log("TODO: NEXT UNIMPLEMENTED")}
                         />
+                        <Animated.View style={{...s_player.controlWidget, opacity: repeatFadeAnim}}>
+                            <Icon 
+                                style={{...s_player.repeat, ...s_player.fadableControlWidget}}
+                                name="loop"
+                                size={30}
+                                onPress={() => {
+                                    console.log("TODO: Repeat UNIMPLEMENTED");
+                                    beginShuffleFade(repeatFadeAnim, !repeat ? 1 : 0.5);
+                                    setRepeat(!repeat);
+                                }}
+                            />
+                        </Animated.View>
                     </View>
                     <View style={s_player.coverWindow}>
                         <Animated.Image

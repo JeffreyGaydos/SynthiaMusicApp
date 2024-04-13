@@ -23,6 +23,8 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const shuffleFadeAnim = trackState?.shuffle ? useRef(new Animated.Value(1)).current : useRef(new Animated.Value(0.5)).current;
     const repeatFadeAnim = trackState?.repeat ? useRef(new Animated.Value(1)).current : useRef(new Animated.Value(0.5)).current;
+    const nextFadeAnim = useRef(new Animated.Value(1)).current;
+    const previousFadeAnim = useRef(new Animated.Value(1)).current;
 
     function beginCoverFade() {
         Animated.timing(fadeAnim, {
@@ -38,6 +40,20 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
             duration: 150,
             useNativeDriver: true
         }).start();
+    }
+
+    function triggerBounceFade(anim: Animated.Value) {
+        Animated.sequence([
+        Animated.timing(anim, {
+            toValue: 0.5,
+            duration: 150,
+            useNativeDriver: true
+        }),
+        Animated.timing(anim, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: true
+        })]).start();
     }
 
     useEffect(() => {
@@ -130,26 +146,34 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
                                 }}
                             />
                         </Animated.View>
-                        <Icon 
-                            style={{...s_player.previous, ...s_player.controlWidget}}
-                            name="previous"
-                            size={30}
-                            onPress={() => {
-                                console.log("TODO: PREVIOUS UNIMPLEMENTED");
-                            }}
-                        />
+                        <Animated.View style={{...s_player.controlWidget, opacity: previousFadeAnim}}>
+                            <Icon 
+                                style={{...s_player.previous, ...s_player.fadableControlWidget}}
+                                name="previous"
+                                size={30}
+                                onPress={() => {
+                                    console.log("TODO: PREVIOUS UNIMPLEMENTED");
+                                    triggerBounceFade(previousFadeAnim);
+                                }}
+                            />
+                        </Animated.View>
                         <Icon 
                             style={{...s_player.playpause, ...s_player.controlWidget}}
                             name={playState ? "pause" : "play"}
                             size={30}
                             onPress={PlayPausePress}
                         />
-                        <Icon 
-                            style={{...s_player.next, ...s_player.controlWidget}}
-                            name="next"
-                            size={30}
-                            onPress={() => console.log("TODO: NEXT UNIMPLEMENTED")}
-                        />
+                        <Animated.View style={{...s_player.controlWidget, opacity: nextFadeAnim}}>
+                            <Icon 
+                                style={{...s_player.next, ...s_player.fadableControlWidget}}
+                                name="next"
+                                size={30}
+                                onPress={() => {
+                                    console.log("TODO: NEXT UNIMPLEMENTED");
+                                    triggerBounceFade(nextFadeAnim);
+                                }}
+                            />
+                        </Animated.View>
                         <Animated.View style={{...s_player.controlWidget, opacity: repeatFadeAnim}}>
                             <Icon 
                                 style={{...s_player.repeat, ...s_player.fadableControlWidget}}

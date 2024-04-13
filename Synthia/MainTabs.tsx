@@ -2,12 +2,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
 import NotificationFooter from './NotificationFooter';
-import ScreenPlaylists from './ScreenPlaylists';
+import ScreenPlaylists from './Playlist/ScreenPlaylists';
 import ScreenArtists from './ScreenArtists';
 import ScreenAlbums from './ScreenAlbums';
 import ScreenMoods from './ScreenMoods';
-import ScreenTracks from './ScreenTracks';
+import ScreenTracks from './Tracks/ScreenTracks';
 import { s_navigation, _colors } from './styles';
+import Player from './Player/Player.tsx';
 
 function MainTabs(): React.JSX.Element {
 
@@ -32,6 +33,7 @@ function MainTabs(): React.JSX.Element {
         <Tab.Screen name="Moods" component={ScreenMoods} />
         <Tab.Screen name="Tracks" component={ScreenTracks} />
       </Tab.Navigator>
+      <Player addTrack={null} url={''}/>
       <NotificationFooter />
     </NavigationContainer>
   );

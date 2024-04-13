@@ -20,8 +20,6 @@ const s_navigation = StyleSheet.create({
     },
     tab_screen: {
         backgroundColor: _colors._colorBackground,
-        borderBottomColor: _colors._colorAccent,
-        borderBottomWidth: 2
     },
     tab_label: {
         fontSize: 13,

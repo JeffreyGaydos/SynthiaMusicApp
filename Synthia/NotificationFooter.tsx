@@ -5,7 +5,7 @@ import {
 
 function NotificationFooter() {
     return (
-        <Text>Synthia Music App v0.0.2</Text>
+        <Text>Synthia Music App v0.0.3</Text>
     )
 }
 

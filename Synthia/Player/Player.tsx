@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, TouchableOpacity, Image, Animated, DimensionValue } from 'react-native';
-import TrackPlayer, { AddTrack, Track } from 'react-native-track-player';
+import { View, Animated, Easing } from 'react-native';
+import TrackPlayer, { AddTrack } from 'react-native-track-player';
 import { s_player } from './Player'
 import Icon from 'react-native-vector-icons/Foundation';
 
@@ -25,6 +25,7 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
     const repeatFadeAnim = trackState?.repeat ? useRef(new Animated.Value(1)).current : useRef(new Animated.Value(0.5)).current;
     const nextFadeAnim = useRef(new Animated.Value(1)).current;
     const previousFadeAnim = useRef(new Animated.Value(1)).current;
+    const progressAnim = useRef(new Animated.Value(0)).current;
 
     function beginCoverFade() {
         Animated.timing(fadeAnim, {
@@ -40,6 +41,24 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
             duration: 150,
             useNativeDriver: true
         }).start();
+    }
+
+    async function startProgressAnim() {
+        stopProgressAnim(); //stop any existing animations for this
+        const duration = (await TrackPlayer.getProgress()).duration;
+        //in case we are behind for whatever reason
+        const currentProgress = (await TrackPlayer.getProgress()).position;
+        progressAnim.setValue(currentProgress / duration * 100);
+        Animated.timing(progressAnim, {
+            toValue: 100,
+            duration: (duration - currentProgress) * 1000,
+            useNativeDriver: false, //can't use it because its a width property. Laggy, but this animation is cleaner than managing state ourselves
+            easing: Easing.linear //to match the math
+        }).start();
+    }
+
+    function stopProgressAnim() {
+        progressAnim.stopAnimation();
     }
 
     function triggerBounceFade(anim: Animated.Value) {
@@ -81,7 +100,9 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
             if(addTrack) {
                 if(playState) {
                     await TrackPlayer.play();
+                    await startProgressAnim();
                 } else {
+                    stopProgressAnim();
                     await TrackPlayer.pause();
                 }
             } else {
@@ -127,10 +148,6 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
     return (
         <>
             {addTrack && <>
-                <View style={{
-                    ...s_player.progress,
-                    width: `${trackProgress * 100}%` as DimensionValue
-                    }}></View>
                 <View style={s_player.container}>
                     <View style={s_player.spacer}></View>
                     <View style={s_player.controls}>
@@ -198,6 +215,14 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
                     </View>
                     <View style={s_player.spacer}></View>
                 </View>
+                <View style={{...s_player.progress_underline}}></View>
+                <Animated.View style={{
+                        ...s_player.progress,
+                        width: progressAnim.interpolate({
+                            inputRange: [0, 100],
+                            outputRange: ['0%', '100%']
+                        })
+                }}></Animated.View>                
             </>}
         </>
     );

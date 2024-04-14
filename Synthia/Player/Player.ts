@@ -5,21 +5,41 @@ import {Dimensions} from 'react-native';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
+const playerHeight = 50;
+const progressHeight = 4;
+const progressBorderHeight = 2;
+const progressColor1 = _colors._colorAccent;
+const progressColor2 = _colors._colorDeepAccent;
+
 const s_player = StyleSheet.create({
     container: {
         width: '100%' as DimensionValue,
-        height: 50,
+        height: playerHeight,
         backgroundColor: 'black',
         flexDirection: 'row',
         justifyContent: 'center',
-        borderTopColor: _colors._colorDeepAccent,
-        borderTopWidth: 2
+        // borderTopColor: _colors._colorDeepAccent,
+        // borderTopWidth: 4
     },
 
     progress: {
-        backgroundColor: _colors._colorAccent,
-        height: 2,
-        width: '0%' as DimensionValue,
+        backgroundColor: progressColor1,
+        position: "absolute",
+        height: progressHeight + progressBorderHeight,
+        width: '100%' as DimensionValue,
+        bottom: playerHeight - progressHeight - progressBorderHeight,
+        borderColor: progressColor2,
+        borderBottomWidth: progressBorderHeight
+    },
+
+    progress_underline: {
+        position: "absolute",
+        height: progressHeight + progressBorderHeight,
+        width: '100%' as DimensionValue,
+        bottom: playerHeight - progressHeight - progressBorderHeight,
+        borderColor: progressColor2,
+        opacity: 0.5,
+        borderBottomWidth: progressBorderHeight,
     },
 
     controls: {
@@ -36,7 +56,7 @@ const s_player = StyleSheet.create({
     cover: {
         height: '100%' as DimensionValue,
         width: '100%' as DimensionValue,
-        position: "absolute"
+        position: "absolute",
     },
 
     coverWindow: {

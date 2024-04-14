@@ -9,6 +9,6 @@ export default function Screen(screenProps: ScreenProps) {
     const { children } = screenProps;
 
     return (
-        <View style={{height: "100%"}}>{children}</View>
+        <View style={{ height: "100%" }}>{children}</View>
     );
 }

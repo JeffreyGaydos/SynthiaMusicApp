@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Text,
   View,
   FlatList,
   SafeAreaView
@@ -13,6 +12,7 @@ import { AddTrack } from 'react-native-track-player';
 function TracksScreen({ navigation }: {navigation: any}) {
   const [existsTest, setExistsText] = useState<Boolean>(false);
   const [hundredsOfTracks, setHundredsOfTracks] = useState<number>(0);
+  const [activeTrack, setActiveTrack] = useState<string>();
   useEffect(() => { (async () => {
     const result = await RNFS.exists(RNFS.ExternalStorageDirectoryPath + "/Music/GUNSHIP/UNICORN/cover.jpg");
     setExistsText(result);
@@ -120,8 +120,11 @@ function TracksScreen({ navigation }: {navigation: any}) {
           image={item.artwork ?? ""}
           navigation={navigation}
           title={item.title ?? "Unknown Title"}
+          trackArtist={item.artist ?? "Unknown artist"}
           musicPath={item.url}
-          key={item.url}/>
+          key={item.url}
+          active={item.url === activeTrack} //This might need to be global state where we compare against what is actually in the track plager
+          setMeActive={() => setActiveTrack(item.url)}/>
       </View>
     );
   }

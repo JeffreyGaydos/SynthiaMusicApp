@@ -6,7 +6,13 @@ import TrackPlayer from 'react-native-track-player';
 function App(): React.JSX.Element {
 
   (async () => {
-    await TrackPlayer.setupPlayer();
+    try {
+      await TrackPlayer.setupPlayer();
+    } catch (e) {
+      if(e == "Error: The player has already been initialized via setupPlayer") {
+        console.warn(e);
+      }
+    }
   })();
 
   return (

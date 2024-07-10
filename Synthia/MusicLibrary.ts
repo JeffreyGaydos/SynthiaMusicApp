@@ -4,7 +4,7 @@ import RNFS, { ReadDirItem } from 'react-native-fs';
 
 export interface MusicLibrary {
     getCountAll(): Promise<number>;
-    getTracks(limit?: number): Promise<AddTrack[]>
+    getTracks(limit?: number, orderBy?: string): Promise<AddTrack[]>
 }
 
 let databaseInstance: SQLite.SQLiteDatabase | undefined;
@@ -43,14 +43,15 @@ async function getCountAll(): Promise<number> {
     return (await db.executeSql("SELECT COUNT(*) FROM Main"))[0].rows.item(0)["COUNT(*)"];
 }
 
-async function getTracks(limit: number | undefined = undefined): Promise<AddTrack[]> {
+async function getTracks(limit: number | undefined = undefined, orderBy: string | undefined = undefined): Promise<AddTrack[]> {
     let query = `
         SELECT 
             FilePath AS id,
             FilePath AS url,
             Title AS title,
             Artist.ArtistName AS trackArtist,
-            group_concat(AlbumArtPath, "$") AS image
+            group_concat(AlbumArtPath, "$") AS image,
+	        group_concat(PrimaryColor, "$") AS primaryColors
         FROM Main
         JOIN ArtistTracks ON Main.TrackID = ArtistTracks.TrackID
         JOIN Artist ON Artist.ArtistID = ArtistTracks.ArtistID
@@ -58,25 +59,22 @@ async function getTracks(limit: number | undefined = undefined): Promise<AddTrac
         JOIN Album ON Album.AlbumID = AlbumTracks.AlbumID
         JOIN AlbumArt ON AlbumArt.AlbumID = Album.AlbumID
         GROUP BY Main.FilePath, Main.Title, Artist.ArtistName
+        ${orderBy != undefined ? `ORDER BY ${orderBy}` : ""}
+        ${limit != undefined ? `LIMIT ${limit}` : ""}
         `;
-    if(limit) {
-        query += `LIMIT ${limit}`;
-    }
     const result = await (await getDatabase()).executeSql(query);
     const tracks : AddTrack[] = [];
-    // const dirItmes : ReadDirItem[] = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath + "/Music/" + "GUNSHIP" + "/" + "GUNSHIP/GUNSHIP - GUNSHIP - 01 The Mountain.flac");
-    // console.log(RNFS.ExternalStorageDirectoryPath + "/Music/" + "GUNSHIP" + "/" + "GUNSHIP/");
-    const exists = await RNFS.exists(RNFS.ExternalStorageDirectoryPath + "/Music/GUNSHIP/UNICORN/cover.jpg");
-    console.log("This vv");
-    console.log(exists);
     for(let i = 0; i < result[0].rows.length; i++) {
         const trackData = result[0].rows.item(i);
+        const allCoverImages = (trackData["image"] as string).split("$");
+        const primaryColors = (trackData["primaryColors"] as string).split("$");
+        const bestImage = allCoverImages.filter(img => img.includes("cover")).length > 0 ? allCoverImages.filter(img => img.includes("cover"))[0] : primaryColors[0];
         const addTrack : AddTrack = {
             id: trackData["id"],
             url: trackData["url"].replace("C:\\Users\\jeff1\\", RNFS.ExternalStorageDirectoryPath + "/").replaceAll("\\", "/"),
             title: trackData["title"],
             artist: trackData["trackArtist"],
-            artwork: RNFS.ExternalStorageDirectoryPath + "/Music/GUNSHIP/UNICORN/cover.jpg"//(trackData["image"] as string).split("$")[0].replaceAll("\\", "/")
+            artwork: bestImage.replace("C:\\Users\\jeff1\\", RNFS.ExternalStorageDirectoryPath + "/").replaceAll("\\", "/")
         };
         tracks.push(addTrack);
     }

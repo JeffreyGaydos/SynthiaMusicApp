@@ -16,7 +16,7 @@ function TracksScreen({ navigation }: {navigation: any}) {
   const [renderedAllMusic, setRenderedAllMusic] = useState<AddTrack[]>([]);
   useEffect(() => {
     (async() => {
-      const tracks = await db.getTracks(undefined, "title ASC");
+      const tracks = await db.getTracks("title ASC");
       setRenderedAllMusic(tracks);
     })();
   }, []);

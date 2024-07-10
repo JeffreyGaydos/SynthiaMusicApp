@@ -4,7 +4,22 @@ import RNFS, { ReadDirItem } from 'react-native-fs';
 
 export interface MusicLibrary {
     getCountAll(): Promise<number>;
-    getTracks(limit?: number, orderBy?: string): Promise<AddTrack[]>
+    getTracks(orderBy?: string, limit?: number): Promise<AddTrack[]>;
+    getArtists(orderBy?: string, limit?: number): Promise<{
+        //TODO make this an object
+        name: string,
+        numTracks: number,
+        sumDurationMsec: number,
+        numAlbums: number
+    }>;
+    getPlaylists(orderBy?: string, limit?: number): Promise<{
+        //TODO make this an object
+        name: string,
+        creationDate: Date,
+        lastEditDate: Date,
+        numTracks: number,
+        numArtists: number
+    }>
 }
 
 let databaseInstance: SQLite.SQLiteDatabase | undefined;
@@ -43,7 +58,7 @@ async function getCountAll(): Promise<number> {
     return (await db.executeSql("SELECT COUNT(*) FROM Main"))[0].rows.item(0)["COUNT(*)"];
 }
 
-async function getTracks(limit: number | undefined = undefined, orderBy: string | undefined = undefined): Promise<AddTrack[]> {
+async function getTracks(orderBy: string | undefined = undefined, limit: number | undefined = undefined): Promise<AddTrack[]> {
     let query = `
         SELECT 
             FilePath AS id,
@@ -81,7 +96,73 @@ async function getTracks(limit: number | undefined = undefined, orderBy: string 
     return tracks;
 }
 
+async function getArtists(orderBy: string | undefined = undefined, limit: number | undefined = undefined): Promise<{name: string,
+    numTracks: number,
+    sumDurationMsec: number,
+    numAlbums: number}> {
+    let query = `
+        SELECT
+            ArtistName AS name,
+            COUNT(ArtistTracks.TrackID) AS numTracks,
+            SUM(Main.Duration) AS sumDurationMsec,
+            COUNT(DISTINCT Album.AlbumID) AS numAlbums
+        FROM Artist
+        JOIN ArtistTracks ON Artist.ArtistID = ArtistTracks.ArtistID
+        JOIN Main ON ArtistTracks.TrackID = Main.TrackID
+        JOIN AlbumTracks ON AlbumTracks.TrackID = Main.TrackID
+        JOIN Album ON AlbumTracks.AlbumID = Album.AlbumID
+        GROUP BY ArtistName
+        ${orderBy != undefined ? `ORDER BY ${orderBy}` : ""}
+        ${limit != undefined ? `LIMIT ${limit}` : ""}
+        `;
+    return {
+        name: "TODO",
+        numTracks: 0,
+        sumDurationMsec: 0,
+        numAlbums: 0
+    };
+}
+
+async function getPlaylists(orderBy: string | undefined = undefined, limit: number | undefined = undefined): Promise<{
+    name: string,
+        creationDate: Date,
+        lastEditDate: Date,
+        numTracks: number,
+        numArtists: number
+}> { //TODO Add filter to "moods"
+    let query = `
+        SELECT
+            Playlist.PlaylistName AS name,
+            Playlist.CreationDate AS creationDate,
+            Playlist.LastEditDate AS lastEditDate,
+            COUNT(PlaylistTracks.TrackID) AS countTracks,
+            COUNT(DISTINCT Artist.ArtistID) AS countArtists
+        FROM Playlist
+        JOIN PlaylistTracks ON Playlist.PlaylistID = PlaylistTracks.PlaylistID
+        JOIN ArtistTracks ON ArtistTracks.TrackID = PlaylistTracks.TrackID
+        JOIN Artist ON Artist.ArtistID = ArtistTracks.ArtistID
+        GROUP BY Playlist.PlaylistName, Playlist.CreationDate, Playlist.LastEditDate
+        ${orderBy != undefined ? `ORDER BY ${orderBy}` : ""}
+        ${limit != undefined ? `LIMIT ${limit}` : ""}
+        `;
+    return {
+        name: "TODO",
+        creationDate: new Date(),
+        lastEditDate: new Date(),
+        numTracks: 0,
+        numArtists: 0
+    };
+}
+
+//TODO Get tracks of playlist
+//TODO Get tracks of artist
+//TODO Get tracks of album
+//TODO Get Images for Artist
+//TODO Get Images for Playlist
+
 export const SQLiteMusicLibrary: MusicLibrary = {
     getCountAll,
-    getTracks
+    getTracks,
+    getArtists,
+    getPlaylists
 };

@@ -10,6 +10,7 @@ import ScreenTracks from './Tracks/ScreenTracks';
 import { s_navigation, _colors } from './styles';
 import Player from './Player/Player.tsx';
 import { AddTrack } from 'react-native-track-player';
+import { MusicLibraryProvider } from './MusicLibraryProvider.tsx';
 
 export const PlayerTrack = React.createContext<{playerTrack: AddTrack | undefined, setPlayerTrack: React.Dispatch<React.SetStateAction<AddTrack | undefined>>}>({
   playerTrack: undefined,
@@ -22,27 +23,29 @@ function MainTabs(): React.JSX.Element {
 
   return (
     <PlayerTrack.Provider value={{ playerTrack: track, setPlayerTrack: setTrack }}>
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={{
-            tabBarStyle: s_navigation.tab_bar,
-            tabBarLabelStyle: s_navigation.tab_label,
-            tabBarActiveTintColor: _colors._colorActive,
-            tabBarInactiveTintColor: _colors._colorAccent,
-            tabBarIndicatorStyle: s_navigation.tab_active,
-            tabBarGap: 1,
-            tabBarAndroidRipple: { borderless: false }
-          }}
-          sceneContainerStyle={s_navigation.tab_screen}>
-          <Tab.Screen name="Playlists" component={ScreenPlaylists} />
-          <Tab.Screen name="Artists" component={ScreenArtists} />
-          <Tab.Screen name="Albums" component={ScreenAlbums} />
-          <Tab.Screen name="Moods" component={ScreenMoods} />
-          <Tab.Screen name="Tracks" component={ScreenTracks} />
-        </Tab.Navigator>
-        <Player addTrack={track}/>
-        <NotificationFooter />
-      </NavigationContainer>
+      <MusicLibraryProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={{
+              tabBarStyle: s_navigation.tab_bar,
+              tabBarLabelStyle: s_navigation.tab_label,
+              tabBarActiveTintColor: _colors._colorActive,
+              tabBarInactiveTintColor: _colors._colorAccent,
+              tabBarIndicatorStyle: s_navigation.tab_active,
+              tabBarGap: 1,
+              tabBarAndroidRipple: { borderless: false }
+            }}
+            sceneContainerStyle={s_navigation.tab_screen}>
+            <Tab.Screen name="Playlists" component={ScreenPlaylists} />
+            <Tab.Screen name="Artists" component={ScreenArtists} />
+            <Tab.Screen name="Albums" component={ScreenAlbums} />
+            <Tab.Screen name="Moods" component={ScreenMoods} />
+            <Tab.Screen name="Tracks" component={ScreenTracks} />
+          </Tab.Navigator>
+          <Player addTrack={track}/>
+          <NotificationFooter />
+        </NavigationContainer>
+      </MusicLibraryProvider>
     </PlayerTrack.Provider>
   );
 }

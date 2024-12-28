@@ -47,7 +47,7 @@ function Player({addTrack, trackState} : {addTrack: AddTrack | undefined, trackS
         stopProgressAnim(); //stop any existing animations for this
         const duration = (await TrackPlayer.getProgress()).duration;
         //in case we are behind for whatever reason
-        const currentProgress = (await TrackPlayer.getProgress()).position;
+        const currentProgress = (await TrackPlayer.getProgress()).position ?? 0;
         progressAnim.setValue(currentProgress / duration * 100);
         Animated.timing(progressAnim, {
             toValue: 100,

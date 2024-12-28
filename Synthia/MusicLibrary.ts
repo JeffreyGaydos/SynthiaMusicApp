@@ -83,7 +83,7 @@ async function getTracks(orderBy: string | undefined = undefined, limit: number 
         const trackData = result[0].rows.item(i);
         const allCoverImages = (trackData["image"] as string).split("$");
         const primaryColors = (trackData["primaryColors"] as string).split("$");
-        const bestImage = allCoverImages.filter(img => img.includes("cover")).length > 0 ? allCoverImages.filter(img => img.includes("cover"))[0] : primaryColors[0];
+        const bestImage = allCoverImages.filter(img => img.includes("AlbumArtSmall")).length > 0 ? allCoverImages.filter(img => img.includes("AlbumArtSmall"))[0] : primaryColors[0];
         const addTrack : AddTrack = {
             id: trackData["id"],
             url: trackData["url"].replace("C:\\Users\\jeff1\\", RNFS.ExternalStorageDirectoryPath + "/").replaceAll("\\", "/"),

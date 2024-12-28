@@ -28,7 +28,7 @@ function TrackItem({ image, title, trackArtist, musicPath, active, setMeActive, 
             </View>
             <View style={{...s_track_item.details_wrapper}}>
                 <Text numberOfLines={1}>{title}</Text>
-                <Text numberOfLines={1}>{trackArtist}</Text>
+                <Text numberOfLines={1}>{image.replace("/storage/emulated/0/Music/", "")}</Text>
             </View>
         </TouchableOpacity>
     );

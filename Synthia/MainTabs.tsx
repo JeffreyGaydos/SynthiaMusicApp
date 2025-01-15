@@ -10,7 +10,8 @@ import ScreenTracks from './Tracks/ScreenTracks';
 import { s_navigation, _colors } from './styles';
 import Player from './Player/Player.tsx';
 import { AddTrack } from 'react-native-track-player';
-import { MusicLibraryProvider } from './MusicLibraryProvider.tsx';
+import { MusicLibraryProvider } from './Backend/MusicLibraryProvider.tsx';
+import ScreenSettings from './ScreenSettings.tsx';
 
 export const PlayerTrack = React.createContext<{playerTrack: AddTrack | undefined, setPlayerTrack: React.Dispatch<React.SetStateAction<AddTrack | undefined>>}>({
   playerTrack: undefined,
@@ -36,6 +37,7 @@ function MainTabs(): React.JSX.Element {
               tabBarAndroidRipple: { borderless: false }
             }}
             sceneContainerStyle={s_navigation.tab_screen}>
+            <Tab.Screen name="⚙️" component={ScreenSettings}/>
             <Tab.Screen name="Playlists" component={ScreenPlaylists} />
             <Tab.Screen name="Artists" component={ScreenArtists} />
             <Tab.Screen name="Albums" component={ScreenAlbums} />

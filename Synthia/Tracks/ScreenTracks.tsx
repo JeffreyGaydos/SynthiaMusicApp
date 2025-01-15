@@ -7,7 +7,7 @@ import {
 import Screen from '../Screen';
 import TrackItem from './TrackItem';
 import { AddTrack } from 'react-native-track-player';
-import { useMusicLibrary } from '../MusicLibraryProvider';
+import { useMusicLibrary } from '../Backend/MusicLibraryProvider';
 
 function TracksScreen({ navigation }: {navigation: any}) {
   const [activeTrack, setActiveTrack] = useState<string>();

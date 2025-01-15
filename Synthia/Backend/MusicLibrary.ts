@@ -1,6 +1,8 @@
 import SQLite from "react-native-sqlite-storage";
 import { AddTrack } from "react-native-track-player";
 import RNFS, { ReadDirItem } from 'react-native-fs';
+import { InitializeSchema } from './MusicLibraryInitialize';
+import { PopulateDatabase } from "./MusicLibraryPopulate";
 
 export interface MusicLibrary {
     getCountAll(): Promise<number>;
@@ -19,7 +21,8 @@ export interface MusicLibrary {
         lastEditDate: Date,
         numTracks: number,
         numArtists: number
-    }>
+    }>;
+    generateDatabase(): Promise<boolean>;
 }
 
 let databaseInstance: SQLite.SQLiteDatabase | undefined;
@@ -31,12 +34,27 @@ async function open() : Promise<SQLite.SQLiteDatabase> {
     if(!databaseInstance) {
         databaseInstance = await SQLite.openDatabase({
             name: "musiclibrary.db",
-            createFromLocation: "~/musiclibrary.db" //requires a pre-populated database file at /android/app/src/main/assets. Rebuild/Reinstall app if this needs to change
+            //createFromLocation: "~/musiclibrary.db" //requires a pre-populated database file at /android/app/src/main/assets. Rebuild/Reinstall app if this needs to change
+            location: "default"
         });
         console.log("Database open!");
     }
 
+    await createSchema(databaseInstance);
+
     return databaseInstance;
+}
+
+async function createSchema(databaseInstance: SQLite.SQLiteDatabase) {
+    var result = await databaseInstance.executeSql("PRAGMA table_info(Settings)")
+    if(result[0].rows.item(0) === undefined) {
+        InitializeSchema(databaseInstance);
+    }
+}
+
+async function generateDatabase(): Promise<boolean> {
+    await PopulateDatabase(await getDatabase());
+    return true;
 }
 
 //not sure if I'll ever need this, but it's here
@@ -164,5 +182,6 @@ export const SQLiteMusicLibrary: MusicLibrary = {
     getCountAll,
     getTracks,
     getArtists,
-    getPlaylists
+    getPlaylists,
+    generateDatabase
 };

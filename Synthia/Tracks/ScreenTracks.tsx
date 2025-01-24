@@ -7,7 +7,9 @@ import {
 import Screen from '../Screen';
 import TrackItem from './TrackItem';
 import { AddTrack } from 'react-native-track-player';
-import { useMusicLibrary } from '../MusicLibraryProvider';
+import { useMusicLibrary } from '../Backend/MusicLibraryProvider';
+
+var refreshToken = false;
 
 function TracksScreen({ navigation }: {navigation: any}) {
   const [activeTrack, setActiveTrack] = useState<string>();
@@ -19,7 +21,7 @@ function TracksScreen({ navigation }: {navigation: any}) {
       const tracks = await db.getTracks("title ASC");
       setRenderedAllMusic(tracks);
     })();
-  }, []);
+  }, [refreshToken]);
 
   const trackItemRenderer = ({item} : {item: AddTrack}) => {
     return (

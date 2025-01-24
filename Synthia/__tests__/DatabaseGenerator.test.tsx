@@ -102,29 +102,30 @@ describe("favored priority list logic", () => {
     });
 });
 
-const defaultDuplicateTrackData = {
+const defaultDuplicateTrackData: TrackData = {
     trackID: null,
     title: "Duplicate Track",
     duration: 1,
     filePath: "/path/duplicate track.mp2",
     generatedDate: null,
-    lastModifiedDate: null,
+    lastModifiedDate: new Date(Date.now()),
     linkedTrackPlaylistID: null,
     rating: null,
     volume: 0
 };
 
 describe("decide database action should figure out duplication and warn the user as needed", () => {
-    test("Incoming data has same path, should be normal update", () => {
+    test("Incoming data has same path but was modified, should be normal update", () => {
         //setup; not part of test
         var mock_logs: {message: string, level: LogLevel}[] = [];
         function mock_pushLog(message: string, level: LogLevel) {
             mock_logs.push({message, level});
         }
         const mockDatabaseLogger: DatabaseLogger = { pushLog: mock_pushLog };
-
+        const newModificationDate = {...defaultDuplicateTrackData};
+        newModificationDate.lastModifiedDate = new Date(Date.now() + 10000);
         const action = TEST_TrackSynchronizer.determineDatabaseAction(
-            defaultDuplicateTrackData,
+            newModificationDate,
             [defaultDuplicateTrackData],
             mockDatabaseLogger,
             []
@@ -337,5 +338,84 @@ describe("decide database action should figure out duplication and warn the user
             }
         );
         expect(action).toBe("SKIP");
+    });
+
+    test("Incoming data was not changed according to modified at date, skip no logs", () => {
+        //setup; not part of test
+        var mock_logs: {message: string, level: LogLevel}[] = [];
+        function mock_pushLog(message: string, level: LogLevel) {
+            mock_logs.push({message, level});
+        }
+        const mockDatabaseLogger: DatabaseLogger = { pushLog: mock_pushLog };
+        
+        const action = TEST_TrackSynchronizer.determineDatabaseAction(
+            defaultDuplicateTrackData,
+            [defaultDuplicateTrackData],
+            mockDatabaseLogger,
+            [{
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            },
+            {
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            }]
+        );
+        expect(mock_logs.length).toBe(0);
+        expect(action).toBe("SKIP");
+    });
+
+    test("Incoming data missing modified date, same path, nomral update", () => {
+        //setup; not part of test
+        var mock_logs: {message: string, level: LogLevel}[] = [];
+        function mock_pushLog(message: string, level: LogLevel) {
+            mock_logs.push({message, level});
+        }
+        const mockDatabaseLogger: DatabaseLogger = { pushLog: mock_pushLog };
+        
+        const missingModifiedDate = {...defaultDuplicateTrackData};
+        missingModifiedDate.lastModifiedDate = null;
+        const action = TEST_TrackSynchronizer.determineDatabaseAction(
+            missingModifiedDate,
+            [defaultDuplicateTrackData],
+            mockDatabaseLogger,
+            [{
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            },
+            {
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            }]
+        );
+        expect(mock_logs.length).toBe(0);
+        expect(action).toBe("UPDATE");
+    });
+
+    test("Existing data missing modified date, same path, nomral update", () => {
+        //setup; not part of test
+        var mock_logs: {message: string, level: LogLevel}[] = [];
+        function mock_pushLog(message: string, level: LogLevel) {
+            mock_logs.push({message, level});
+        }
+        const mockDatabaseLogger: DatabaseLogger = { pushLog: mock_pushLog };
+        
+        const missingModifiedDate = {...defaultDuplicateTrackData};
+        missingModifiedDate.lastModifiedDate = null;
+        const action = TEST_TrackSynchronizer.determineDatabaseAction(
+            defaultDuplicateTrackData,
+            [missingModifiedDate],
+            mockDatabaseLogger,
+            [{
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            },
+            {
+                title: defaultDuplicateTrackData.title,
+                duration: defaultDuplicateTrackData.duration
+            }]
+        );
+        expect(mock_logs.length).toBe(0);
+        expect(action).toBe("UPDATE");
     });
 });

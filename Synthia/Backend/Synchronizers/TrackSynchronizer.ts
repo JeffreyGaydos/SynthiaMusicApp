@@ -64,7 +64,11 @@ function getFavoredFile(incomingExtension: string, incomingFile: string, existin
 function determineDatabaseAction(incoming: TrackData, duplicateTracks: TrackData[], logger: DatabaseLogger, seenThisRun: TrackNaturalKey[]): DatabaseAction {
     if(duplicateTracks.length == 1) {
         if(duplicateTracks[0].filePath == incoming.filePath) {
-            return "UPDATE";
+            if(incoming.lastModifiedDate && duplicateTracks[0].lastModifiedDate && incoming.lastModifiedDate <= duplicateTracks[0].lastModifiedDate) {
+                return "SKIP";
+            } else {
+                return "UPDATE";
+            }
         } else {
             const incomingExtension = getExtension(incoming.filePath);
             const existingExtension = getExtension(duplicateTracks[0].filePath);

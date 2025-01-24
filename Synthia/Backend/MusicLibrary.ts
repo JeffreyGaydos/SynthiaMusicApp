@@ -1,12 +1,17 @@
-import SQLite from "react-native-sqlite-storage";
+import SQLite, { deleteDatabase } from "react-native-sqlite-storage";
 import { AddTrack } from "react-native-track-player";
 import RNFS, { ReadDirItem } from 'react-native-fs';
-import { InitializeSchema } from './MusicLibraryInitialize';
+import { InitializeSchema } from './Schema/MusicLibraryInitialize';
 import { PopulateDatabase } from "./MusicLibraryPopulate";
+import { Song } from "react-native-get-music-files/lib/typescript/src/NativeTurboSongs";
+import { DeleteData } from "./Schema/MusicLibraryDelete";
+import { DropSchema } from "./Schema/MusicLibraryDrop";
+import { DatabaseLogger } from "../Settings/ScreenSettings";
+import { TrackData } from "./Schema";
 
 export interface MusicLibrary {
     getCountAll(): Promise<number>;
-    getTracks(orderBy?: string, limit?: number): Promise<AddTrack[]>;
+    getTracks(orderBy?: string, limit?: number, where?: string): Promise<AddTrack[]>;
     getArtists(orderBy?: string, limit?: number): Promise<{
         //TODO make this an object
         name: string,
@@ -22,7 +27,9 @@ export interface MusicLibrary {
         numTracks: number,
         numArtists: number
     }>;
-    generateDatabase(): Promise<boolean>;
+    generateDatabase(track: Song, logger: DatabaseLogger): Promise<boolean>;
+    refreshSchema(): Promise<void>;
+    getDatabase(): Promise<SQLite.SQLiteDatabase>;
 }
 
 let databaseInstance: SQLite.SQLiteDatabase | undefined;
@@ -33,7 +40,7 @@ async function open() : Promise<SQLite.SQLiteDatabase> {
 
     if(!databaseInstance) {
         databaseInstance = await SQLite.openDatabase({
-            name: "musiclibrary.db",
+            name: "synthia.db",
             //createFromLocation: "~/musiclibrary.db" //requires a pre-populated database file at /android/app/src/main/assets. Rebuild/Reinstall app if this needs to change
             location: "default"
         });
@@ -52,9 +59,16 @@ async function createSchema(databaseInstance: SQLite.SQLiteDatabase) {
     }
 }
 
-async function generateDatabase(): Promise<boolean> {
-    await PopulateDatabase(await getDatabase());
+async function generateDatabase(track: Song, logger: DatabaseLogger): Promise<boolean> {
+    await PopulateDatabase(await getDatabase(), track, logger);
     return true;
+}
+
+async function refreshSchema() {
+    var db = await getDatabase();
+    await DeleteData(db);
+    await DropSchema(db);
+    await InitializeSchema(db);
 }
 
 //not sure if I'll ever need this, but it's here
@@ -73,10 +87,10 @@ async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
 async function getCountAll(): Promise<number> {
     const db = await getDatabase();
-    return (await db.executeSql("SELECT COUNT(*) FROM Main"))[0].rows.item(0)["COUNT(*)"];
+    return (await db.executeSql("SELECT COUNT(*) FROM Track"))[0].rows.item(0)["COUNT(*)"];
 }
 
-async function getTracks(orderBy: string | undefined = undefined, limit: number | undefined = undefined): Promise<AddTrack[]> {
+async function getTracks(orderBy: string | undefined = undefined, limit: number | undefined = undefined, where: string | undefined = undefined): Promise<AddTrack[]> {
     let query = `
         SELECT 
             FilePath AS id,
@@ -85,13 +99,14 @@ async function getTracks(orderBy: string | undefined = undefined, limit: number 
             Artist.ArtistName AS trackArtist,
             group_concat(AlbumArtPath, "$") AS image,
 	        group_concat(PrimaryColor, "$") AS primaryColors
-        FROM Main
-        JOIN ArtistTracks ON Main.TrackID = ArtistTracks.TrackID
+        FROM Track
+        JOIN ArtistTracks ON Track.TrackID = ArtistTracks.TrackID
         JOIN Artist ON Artist.ArtistID = ArtistTracks.ArtistID
-        JOIN AlbumTracks ON AlbumTracks.TrackID = Main.TrackID
+        JOIN AlbumTracks ON AlbumTracks.TrackID = Track.TrackID
         JOIN Album ON Album.AlbumID = AlbumTracks.AlbumID
         JOIN AlbumArt ON AlbumArt.AlbumID = Album.AlbumID
-        GROUP BY Main.FilePath, Main.Title, Artist.ArtistName
+        ${where != undefined ? `WHERE ${where}` : ""}
+        GROUP BY Track.FilePath, Track.Title, Artist.ArtistName
         ${orderBy != undefined ? `ORDER BY ${orderBy}` : ""}
         ${limit != undefined ? `LIMIT ${limit}` : ""}
         `;
@@ -122,12 +137,12 @@ async function getArtists(orderBy: string | undefined = undefined, limit: number
         SELECT
             ArtistName AS name,
             COUNT(ArtistTracks.TrackID) AS numTracks,
-            SUM(Main.Duration) AS sumDurationMsec,
+            SUM(Track.Duration) AS sumDurationMsec,
             COUNT(DISTINCT Album.AlbumID) AS numAlbums
         FROM Artist
         JOIN ArtistTracks ON Artist.ArtistID = ArtistTracks.ArtistID
-        JOIN Main ON ArtistTracks.TrackID = Main.TrackID
-        JOIN AlbumTracks ON AlbumTracks.TrackID = Main.TrackID
+        JOIN Track ON ArtistTracks.TrackID = Track.TrackID
+        JOIN AlbumTracks ON AlbumTracks.TrackID = Track.TrackID
         JOIN Album ON AlbumTracks.AlbumID = Album.AlbumID
         GROUP BY ArtistName
         ${orderBy != undefined ? `ORDER BY ${orderBy}` : ""}
@@ -183,5 +198,7 @@ export const SQLiteMusicLibrary: MusicLibrary = {
     getTracks,
     getArtists,
     getPlaylists,
-    generateDatabase
+    generateDatabase,
+    refreshSchema,
+    getDatabase //NOTE: For internal use only. The frontend should use only those methods found in here (hint: maybe we should split those off so this is just for creating the instance, etc.)
 };

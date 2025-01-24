@@ -11,7 +11,7 @@ import { s_navigation, _colors } from './styles';
 import Player from './Player/Player.tsx';
 import { AddTrack } from 'react-native-track-player';
 import { MusicLibraryProvider } from './Backend/MusicLibraryProvider.tsx';
-import ScreenSettings from './ScreenSettings.tsx';
+import ScreenSettings from './Settings/ScreenSettings.tsx';
 
 export const PlayerTrack = React.createContext<{playerTrack: AddTrack | undefined, setPlayerTrack: React.Dispatch<React.SetStateAction<AddTrack | undefined>>}>({
   playerTrack: undefined,
@@ -44,7 +44,12 @@ function MainTabs(): React.JSX.Element {
             <Tab.Screen name="Moods" component={ScreenMoods} />
             <Tab.Screen name="Tracks" component={ScreenTracks} />
           </Tab.Navigator>
-          <Player addTrack={track}/>
+          <Player trackState={{
+            repeat: false,
+            shuffle: false,
+            toggleRepeat: () => {},
+            toggleShuffle: () => {},
+          }} addTrack={track}/>
           <NotificationFooter />
         </NavigationContainer>
       </MusicLibraryProvider>

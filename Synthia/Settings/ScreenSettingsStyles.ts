@@ -14,6 +14,12 @@ const settings_screen = StyleSheet.create({
     },
     log_text: {
         color: "rgb(139, 139, 139)"
+    },
+    error_text: {
+        color: "rgb(200, 100, 100)"
+    },
+    warning_text: {
+        color: "rgb(250, 200, 100)"
     }
 })
 

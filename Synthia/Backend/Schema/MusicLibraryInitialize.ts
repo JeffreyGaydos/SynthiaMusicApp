@@ -110,26 +110,26 @@ CREATE TABLE IF NOT EXISTS Track (
 	Duration DECIMAL,
 	FilePath VARCHAR(260), --windows max path length = 260 characters
 	Volume INT, --A user defined value to help when manually matching volume across multiple files
-	[Owner] NVARCHAR(1000), --defaults to the computer username, but can be used for however
-	ReleaseYear INT,
-	Lyrics NVARCHAR(4000),
-	Comment NVARCHAR(4000),
-	BeatsPerMin INT,
-	Copyright NVARCHAR(1000),
-	Publisher NVARCHAR(1000),
-	ISRC VARCHAR(12), --ISRC codes are explicitly 12 characters long
-	Bitrate INT,
-	Channels INT,
-	SampleRate INT,
-	BitsPerSample INT,
+	--[Owner] NVARCHAR(1000), --defaults to the computer username, but can be used for however
+	--ReleaseYear INT,
+	--Lyrics NVARCHAR(4000),
+	--Comment NVARCHAR(4000),
+	--BeatsPerMin INT,
+	--Copyright NVARCHAR(1000),
+	--Publisher NVARCHAR(1000),
+	--ISRC VARCHAR(12), --ISRC codes are explicitly 12 characters long
+	--Bitrate INT,
+	--Channels INT,
+	--SampleRate INT,
+	--BitsPerSample INT,
 	LinkedTrackPlaylistID INT, --Linked Tracks are any tracks that are best when played back-to-back. This mini-playlist defines the order
 	Rating INT, --User defined only; Not generated because ratings "on" mp3 files are specific to the Windows OS (might consider adding support)
-	AddDate DATETIME, --will attempt to persist this value during update operations
+	--AddDate DATETIME, --will attempt to persist this value during update operations
 	LastModifiedDate DATETIME,
 	GeneratedDate DATETIME, --used to determine if updates are needed
-	CONSTRAINT UC_Main UNIQUE (
+	CONSTRAINT UC_Track UNIQUE (
 		Title,
-		ISRC,
+		--ISRC,
 		Duration
 	)
 )`;

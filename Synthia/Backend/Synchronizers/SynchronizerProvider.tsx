@@ -1,7 +1,7 @@
 import React from "react";
 import { TrackSynchronizer } from "./TrackSynchronizer";
 
-interface Synchronizers {
+export interface Synchronizers {
     trackSynchronizer: TrackSynchronizer
 }
 

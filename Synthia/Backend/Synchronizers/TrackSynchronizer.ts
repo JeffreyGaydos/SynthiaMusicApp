@@ -1,6 +1,5 @@
 import { DatabaseLogger } from "../../Settings/ScreenSettings";
-import { DatabaseAction, TrackData, TrackNaturalKey } from "../Schema";
-import { useMusicLibrary } from "../MusicLibraryProvider";
+import { DatabaseAction, EscapeForSingleQuotes, TrackData, TrackNaturalKey } from "../Schema";
 import SQLite from "react-native-sqlite-storage";
 
 const RGX_extension = new RegExp(/(?<=\.)[a-zA-Z0-9]+$/);
@@ -12,7 +11,7 @@ export interface TEST_TrackSynchronizer {
 }
 
 export interface TrackSynchronizer {
-    synchronize(data: TrackData, logger: DatabaseLogger): void
+    synchronize(db: SQLite.SQLiteDatabase, data: TrackData, logger: DatabaseLogger): Promise<DatabaseAction>
 };
 
 const FileTypeFavorList = [
@@ -64,7 +63,8 @@ function getFavoredFile(incomingExtension: string, incomingFile: string, existin
 function determineDatabaseAction(incoming: TrackData, duplicateTracks: TrackData[], logger: DatabaseLogger, seenThisRun: TrackNaturalKey[]): DatabaseAction {
     if(duplicateTracks.length == 1) {
         if(duplicateTracks[0].filePath == incoming.filePath) {
-            if(incoming.lastModifiedDate && duplicateTracks[0].lastModifiedDate && incoming.lastModifiedDate <= duplicateTracks[0].lastModifiedDate) {
+            if(incoming.lastModifiedDate && duplicateTracks[0].lastModifiedDate //null checks
+                && incoming.lastModifiedDate.getTime() <= new Date(duplicateTracks[0].lastModifiedDate).getTime()) {
                 return "SKIP";
             } else {
                 return "UPDATE";
@@ -103,26 +103,20 @@ function determineDatabaseAction(incoming: TrackData, duplicateTracks: TrackData
     }
 }
 
-async function setupDatabaseConnection(): Promise<SQLite.SQLiteDatabase> {
-    const db = useMusicLibrary();
-    return await db.getDatabase();
-}
-
-async function synchronize(data: TrackData, logger: DatabaseLogger): Promise<DatabaseAction> {
+async function synchronize(db: SQLite.SQLiteDatabase, data: TrackData, logger: DatabaseLogger): Promise<DatabaseAction> {
     seenThisRun.push({
         title: data.title,
         duration: data.duration
     });
-    const instance = await setupDatabaseConnection();
-    const duplicationTracks = await getDuplicateTracks(data, instance);
+    const duplicationTracks = await getDuplicateTracks(data, db);
     
     const action = determineDatabaseAction(data, duplicationTracks, logger, seenThisRun);
     switch(action) {
         case "INSERT":
-            insert(data, instance);
+            insert(data, db);
             break;
         case "UPDATE":
-            update(data, instance);
+            update(data, db);
             break;
         //No code necessary for "SKIP" action; "DELETE" action not allowed here
     }
@@ -143,7 +137,7 @@ async function getDuplicateTracks(data: TrackData, db: SQLite.SQLiteDatabase): P
             GeneratedDate
         FROM Track
         WHERE
-            Title = '${data.title}'
+            Title = '${EscapeForSingleQuotes(data.title)}'
             AND Duration = ${data.duration}
     `;
     const results = await db.executeSql(query);
@@ -169,7 +163,7 @@ async function insert(data: TrackData, db: SQLite.SQLiteDatabase): Promise<Datab
     await db.executeSql(`
         INSERT INTO Track
         VALUES
-        (NULL, '${data.title}', ${data.duration}, '${data.filePath}', ${data.volume}, ${data.linkedTrackPlaylistID}, ${data.rating}, '${data.lastModifiedDate}', '${data.generatedDate}')
+        (NULL, '${EscapeForSingleQuotes(data.title)}', ${data.duration}, '${EscapeForSingleQuotes(data.filePath)}', ${data.volume}, ${data.linkedTrackPlaylistID}, ${data.rating}, '${data.lastModifiedDate}', '${data.generatedDate}')
     `);
     return "INSERT";
 }
@@ -178,15 +172,15 @@ async function update(data: TrackData, db: SQLite.SQLiteDatabase): Promise<Datab
     await db.executeSql(`
         UPDATE Track
         SET
-            Title = '${data.title}',
+            Title = '${EscapeForSingleQuotes(data.title)}',
             Duration = ${data.duration},
-            FilePath = '${data.filePath}',
+            FilePath = '${EscapeForSingleQuotes(data.filePath)}',
             Volume = ${data.volume},
             LinkedTrackPlaylistID = ${data.linkedTrackPlaylistID},
             Rating = ${data.rating},
             LastModifiedDate = '${data.lastModifiedDate}',
             GeneratedDate = '${data.generatedDate}'
-        WHERE Title = '${data.title}' AND Duration = ${data.duration}
+        WHERE Title = '${EscapeForSingleQuotes(data.title)}' AND Duration = ${data.duration}
     `);
     return "UPDATE";
 }

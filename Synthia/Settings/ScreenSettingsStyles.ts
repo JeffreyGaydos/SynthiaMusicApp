@@ -16,7 +16,7 @@ const settings_screen = StyleSheet.create({
         color: "rgb(139, 139, 139)"
     },
     error_text: {
-        color: "rgb(200, 100, 100)"
+        color: "rgb(255, 0, 0)"
     },
     warning_text: {
         color: "rgb(250, 200, 100)"

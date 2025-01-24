@@ -12,6 +12,8 @@ import Player from './Player/Player.tsx';
 import { AddTrack } from 'react-native-track-player';
 import { MusicLibraryProvider } from './Backend/MusicLibraryProvider.tsx';
 import ScreenSettings from './Settings/ScreenSettings.tsx';
+import { SynchronizerProvider } from './Backend/Synchronizers/SynchronizerProvider.tsx';
+import { GeneratorProvider } from './Backend/Generators/GeneratorProvider.tsx';
 
 export const PlayerTrack = React.createContext<{playerTrack: AddTrack | undefined, setPlayerTrack: React.Dispatch<React.SetStateAction<AddTrack | undefined>>}>({
   playerTrack: undefined,

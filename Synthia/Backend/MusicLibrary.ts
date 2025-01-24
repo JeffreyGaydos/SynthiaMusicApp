@@ -7,7 +7,6 @@ import { Song } from "react-native-get-music-files/lib/typescript/src/NativeTurb
 import { DeleteData } from "./Schema/MusicLibraryDelete";
 import { DropSchema } from "./Schema/MusicLibraryDrop";
 import { DatabaseLogger } from "../Settings/ScreenSettings";
-import { TrackData } from "./Schema";
 
 export interface MusicLibrary {
     getCountAll(): Promise<number>;
@@ -27,7 +26,7 @@ export interface MusicLibrary {
         numTracks: number,
         numArtists: number
     }>;
-    generateDatabase(track: Song, logger: DatabaseLogger): Promise<boolean>;
+    generateDatabase(track: Song, logger: DatabaseLogger, totalCount: number): Promise<boolean>
     refreshSchema(): Promise<void>;
     getDatabase(): Promise<SQLite.SQLiteDatabase>;
 }
@@ -59,8 +58,8 @@ async function createSchema(databaseInstance: SQLite.SQLiteDatabase) {
     }
 }
 
-async function generateDatabase(track: Song, logger: DatabaseLogger): Promise<boolean> {
-    await PopulateDatabase(await getDatabase(), track, logger);
+async function generateDatabase(track: Song, logger: DatabaseLogger, totalCount: number): Promise<boolean> {
+    await PopulateDatabase(await getDatabase(), track, logger, totalCount);
     return true;
 }
 

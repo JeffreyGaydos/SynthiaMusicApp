@@ -1,7 +1,7 @@
 import React from "react";
 import { TrackGenerator } from "./TrackGenerator";
 
-interface Generators {
+export interface Generators {
     trackGenerator: TrackGenerator
 }
 
